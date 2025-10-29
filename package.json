@@ -1,26 +1,30 @@
 {
-  "name": "fordac-superadmin-frontend",
-  "version": "0.1.0",
-  "private": true,
+  "name": "fordac-superadmin-api",
+  "version": "1.0.0",
+  "description": "API SuperAdmin FORDAC Connect - gestion centralisée des comptes et statistiques",
+  "type": "module",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "node src/server.js",
+    "init": "node src/initSuperAdmin.js"
   },
+  "keywords": [
+    "fordac",
+    "superadmin",
+    "api",
+    "postgresql",
+    "nodejs",
+    "express"
+  ],
+  "author": "Apps 1 Global",
+  "license": "MIT",
   "dependencies": {
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "next": "16.0.0"
-  },
-  "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "16.0.0"
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.5",
+    "pg": "^8.11.3"
   }
 }
