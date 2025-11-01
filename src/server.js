@@ -1,26 +1,37 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
-import { pool } from "./config/db.js";
+import cors from "cors";
+import pool from "./config/db.js";
 import superAdminRoutes from "./routes/superAdminRoutes.js";
 
 dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 5002;
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Vérification de connexion DB
-pool.connect().then(() => console.log("✅ PostgreSQL prêt pour requêtes.")).catch(console.error);
+// Vérification connexion DB
+pool
+  .connect()
+  .then((client) => {
+    console.log("✅ Connecté à PostgreSQL");
+    client.release();
+  })
+  .catch((err) => {
+    console.error("❌ Erreur PostgreSQL :", err.message);
+  });
 
-// Routes principales
-app.use("/api/superadmin", superAdminRoutes);
+// Routes API
+app.use("/api", superAdminRoutes);
 
 // Test route
 app.get("/", (req, res) => {
-  res.json({ message: "API SuperAdmin FORDAC opérationnelle." });
+  res.json({ message: "Bienvenue sur l’API SuperAdmin FORDAC", version: "1.0.0" });
 });
 
-// Lancement du serveur
-app.listen(process.env.PORT, () => {
-  console.log(`🚀 Serveur SuperAdmin FORDAC sur le port ${process.env.PORT}`);
+// Lancement serveur
+app.listen(PORT, () => {
+  console.log(`🚀 Serveur SuperAdmin démarré sur le port ${PORT}`);
 });

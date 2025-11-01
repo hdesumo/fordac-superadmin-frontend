@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 🌍 TYPOGRAPHIE ET STRUCTURE GÉNÉRALE */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", "Poppins", sans-serif;
+  background-color: var(--neutral);
+  color: var(--dark);
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* TITRES ET PARAGRAPHES */
+h1, h2, h3, h4 {
+  font-family: "Merriweather", serif;
+  letter-spacing: -0.5px;
+}
+
+p {
+  line-height: 1.7;
+}
+
+/* 🌑 MODE SOMBRE */
+.dark body {
+  background-color: #0d1a0d;
+  color: #e5e5e5;
+}
+
+.dark a {
+  color: #c8facc;
+}
+
+.dark a:hover {
+  color: #6ee76f;
+}
+
+/* 🎨 COULEURS PERSONNALISÉES */
+:root {
+  --primary: #1b5e20; /* Vert profond FORDAC */
+  --secondary: #4caf50; /* Vert clair accent */
+  --neutral: #f4f1ee;
+  --dark: #1e1e1e;
+  --light: #ffffff;
+}
+
+.dark {
+  --primary: #0f2610;
+  --secondary: #6ee76f;
+  --neutral: #0d1a0d;
+  --dark: #f4f4f4;
+  --light: #ffffff;
+}
+
+/* 🟢 BOUTONS */
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--light);
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  border: 2px solid var(--secondary);
+  color: var(--secondary);
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-outline:hover {
+  background-color: var(--secondary);
+  color: var(--light);
+}
+
+/* 💫 EFFETS VISUELS */
+.text-glow {
+  text-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+}
+
+.card-hover {
+  transition: all 0.3s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 🧭 ESPACEMENT SECTIONS */
+section {
+  scroll-margin-top: 100px;
+}
+
+/* ⚙️ TRANSITIONS GÉNÉRALES */
+* {
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+/* 📱 RESPONSIVE */
+@media (max-width: 768px) {
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1.4rem; }
+  .btn-primary,
+  .btn-outline {
+    font-size: 0.9rem;
+  }
+}

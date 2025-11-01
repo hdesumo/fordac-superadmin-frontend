@@ -1,95 +1,100 @@
+// src/routes/superAdminRoutes.js
 import express from "express";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import { pool } from "../config/db.js";
-
-dotenv.config();
+import pool from "../config/db.js";
+import {
+  loginSuperAdmin,
+  changePassword,
+  verifyToken,
+  verifySuperAdmin,
+  getEvents,
+  createEvent,
+  deleteEvent,
+} from "../controllers/superAdminController.js";
 
 const router = express.Router();
 
-// ==============================
-// 🔐 Connexion SuperAdmin
-// ==============================
-router.post("/login", async (req, res) => {
+/* =========================================
+   🔑 Authentification & sécurité
+========================================= */
+router.post("/superadmin/login", loginSuperAdmin);
+router.post("/superadmin/change-password", verifyToken, changePassword);
+router.get("/superadmin/verify", verifyToken, verifySuperAdmin);
+
+/* =========================================
+   👥 CRUD Administrateurs (protégé)
+========================================= */
+
+// ➕ Créer un administrateur
+router.post("/admins", verifyToken, async (req, res) => {
   try {
-    const { password } = req.body;
-
-    if (!password) {
-      return res.status(400).json({ error: "Le mot de passe est requis." });
+    const { name, email, role, department } = req.body;
+    if (!name || !email || !role || !department) {
+      return res.status(400).json({ error: "Champs manquants." });
     }
 
-    const result = await pool.query("SELECT * FROM superadmin LIMIT 1");
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "SuperAdmin introuvable." });
-    }
+    const result = await pool.query(
+      "INSERT INTO admins (name, email, role, department) VALUES ($1, $2, $3, $4) RETURNING *",
+      [name, email, role, department]
+    );
 
-    const superadmin = result.rows[0];
-    const isValid = await bcrypt.compare(password, superadmin.password);
-    if (!isValid) {
-      return res.status(401).json({ error: "Mot de passe incorrect." });
-    }
-
-    const token = jwt.sign({ id: superadmin.id, role: "superadmin" }, process.env.JWT_SECRET, {
-      expiresIn: "8h",
-    });
-
-    res.status(200).json({ message: "Connexion réussie", token });
-  } catch (err) {
-    console.error("Erreur login SuperAdmin:", err.message);
-    res.status(500).json({ error: "Erreur serveur." });
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("❌ Erreur création admin :", error.message);
+    res.status(500).json({ error: error.message });
   }
 });
 
-// ==============================
-// 🔁 Changer le mot de passe
-// ==============================
-router.post("/change-password", async (req, res) => {
+// 📋 Liste des administrateurs
+router.get("/admins", verifyToken, async (req, res) => {
   try {
-    const { oldPassword, newPassword } = req.body;
-
-    if (!oldPassword || !newPassword) {
-      return res.status(400).json({ error: "Les deux mots de passe sont requis." });
-    }
-
-    const result = await pool.query("SELECT * FROM superadmin LIMIT 1");
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Compte introuvable." });
-    }
-
-    const admin = result.rows[0];
-    const isValid = await bcrypt.compare(oldPassword, admin.password);
-    if (!isValid) {
-      return res.status(401).json({ error: "Mot de passe actuel incorrect." });
-    }
-
-    const newHash = await bcrypt.hash(newPassword, 10);
-    await pool.query("UPDATE superadmin SET password=$1 WHERE id=$2", [newHash, admin.id]);
-
-    res.status(200).json({ message: "Mot de passe modifié avec succès." });
-  } catch (err) {
-    console.error("Erreur changement mot de passe:", err.message);
-    res.status(500).json({ error: "Erreur serveur." });
+    const result = await pool.query("SELECT * FROM admins ORDER BY id DESC");
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Erreur récupération admins :", error.message);
+    res.status(500).json({ error: error.message });
   }
 });
 
-// ==============================
-// 📊 Statistiques globales
-// ==============================
-router.get("/stats", async (req, res) => {
+// 🗑️ Supprimer un administrateur
+router.delete("/admins/:id", verifyToken, async (req, res) => {
   try {
-    const admins = await pool.query("SELECT COUNT(*) FROM admins");
-    const events = await pool.query("SELECT COUNT(*) FROM events");
-    const members = await pool.query("SELECT COUNT(*) FROM members");
+    const { id } = req.params;
+    await pool.query("DELETE FROM admins WHERE id=$1", [id]);
+    res.json({ message: "Administrateur supprimé avec succès." });
+  } catch (error) {
+    console.error("Erreur suppression admin :", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
 
-    res.json({
-      admins: parseInt(admins.rows[0].count, 10) || 0,
-      events: parseInt(events.rows[0].count, 10) || 0,
-      members: parseInt(members.rows[0].count, 10) || 0,
-    });
-  } catch (err) {
-    console.error("Erreur stats:", err.message);
-    res.status(500).json({ error: "Erreur lors du calcul des statistiques." });
+/* =========================================
+   📅 Gestion des événements (protégée)
+========================================= */
+router.get("/events", verifyToken, getEvents);
+router.post("/events", verifyToken, createEvent);
+router.delete("/events/:id", verifyToken, deleteEvent);
+
+/* =========================================
+   🧾 Activité des administrateurs (protégée)
+========================================= */
+router.get("/admins/activity", verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        a.name, 
+        a.email, 
+        a.department,
+        l.action, 
+        l.timestamp, 
+        l.ip_address
+      FROM admin_logs l
+      JOIN admins a ON l.admin_id = a.id
+      ORDER BY l.timestamp DESC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Erreur récupération logs:", error.message);
+    res.status(500).json({ error: "Erreur serveur." });
   }
 });
 

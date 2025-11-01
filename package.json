@@ -1,30 +1,31 @@
 {
-  "name": "fordac-superadmin-api",
+  "name": "fordac-superadmin-frontend",
   "version": "1.0.0",
-  "description": "API SuperAdmin FORDAC Connect - gestion centralisée des comptes et statistiques",
-  "type": "module",
-  "main": "src/server.js",
+  "private": true,
   "scripts": {
-    "dev": "node src/server.js",
-    "init": "node src/initSuperAdmin.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "keywords": [
-    "fordac",
-    "superadmin",
-    "api",
-    "postgresql",
-    "nodejs",
-    "express"
-  ],
-  "author": "Apps 1 Global",
-  "license": "MIT",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^6.9.5",
-    "pg": "^8.11.3"
+    "axios": "^1.7.7",
+    "framer-motion": "^11.2.10",
+    "lucide-react": "^0.378.0",
+    "next": "^14.2.33",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-icons": "^5.2.1",
+    "react-toastify": "^10.0.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^22.7.6",
+    "@types/react": "^18.3.12",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.4.5"
   }
 }

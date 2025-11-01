@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Lock } from "lucide-react";
 
@@ -26,20 +25,23 @@ export default function LoginPage() {
       const apiUrl =
         process.env.NEXT_PUBLIC_API_URL || "https://api-superadmin.fordac-connect.org";
 
-      const res = await axios.post(`${apiUrl}/api/superadmin/login`, {
-        password,
+      const res = await fetch(`${apiUrl}/api/superadmin/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
       });
 
-      if (res.data?.token) {
-        localStorage.setItem("superadmin_token", res.data.token);
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        localStorage.setItem("superadmin_token", data.token);
         router.push("/dashboard");
       } else {
-        setError(res.data?.error || "Mot de passe incorrect.");
+        setError(data.error || "Mot de passe incorrect.");
       }
-    } catch (err: any) {
-      setError(
-        err.response?.data?.error || "Erreur de connexion au serveur SuperAdmin."
-      );
+    } catch (err) {
+      console.error(err);
+      setError("Erreur de connexion au serveur SuperAdmin.");
     } finally {
       setLoading(false);
     }
