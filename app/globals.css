@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body {
+    @apply min-h-screen font-sans bg-[linear-gradient(135deg,#1B5E20_0%,#C1121F_100%)] text-white;
+  }
+}
